@@ -3,6 +3,9 @@
 @section ('content')
 
     @if ($blogs->count())
+    <p>
+        Total: {{ $blogs->total() }} Rows.
+    </p>
     @foreach ($blogs as $blog)
     <div class="card" style="margin-top: 20px;">
         <div class="card-header bg-primary text-light">{{ $blog->title }}</div>
