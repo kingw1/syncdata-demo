@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Blog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
@@ -14,7 +15,7 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $blogs = Blog::paginate(3);
+        $blogs = Blog::orderBy('created_at', 'DESC')->paginate(2);
 
         return view('blog.index', compact('blogs'));
     }
@@ -26,7 +27,7 @@ class BlogController extends Controller
      */
     public function create()
     {
-        //
+        return view('blog.form');
     }
 
     /**
@@ -37,7 +38,11 @@ class BlogController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $datas = $request->all();
+        $datas['id'] = (string) Str::uuid();
+        Blog::create($datas);
+
+        return redirect()->route('blog.index');
     }
 
     /**
