@@ -27,12 +27,20 @@
           <li class="nav-item {{ request()->segment(1) === 'blog' && request()->segment(2) === 'create' ? 'active' : '' }}">
             <a class="nav-link" href="/blog/create">Create</a>
           </li>
+          @if (config('app.env') === 'local')
+          <li class="nav-item {{ request()->segment(1) === 'blog' && request()->segment(2) === 'create' ? 'active' : '' }}">
+            <a class="nav-link" href="/data/push" onclick="return confirm('Confirm to sync data!');">Push Data</a>
+          </li>
+          @endif
         </ul>
       </div>
       </div>
     </nav>
 
     <div class="container" style="margin-top: 80px;">
+      <p>
+        @include ('layouts.partials.flash-message')
+      </p>
       @yield('content')
     </div>
 
