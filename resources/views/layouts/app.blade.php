@@ -28,7 +28,7 @@
             <a class="nav-link" href="/blog/create">Create</a>
           </li>
           @if (config('app.env') === 'local')
-          <li class="nav-item {{ request()->segment(1) === 'blog' && request()->segment(2) === 'create' ? 'active' : '' }}">
+          <li class="nav-item {{ request()->segment(1) === 'data' && request()->segment(2) === 'push' ? 'active' : '' }}">
             <a class="nav-link" href="/data/push" onclick="return confirm('Confirm to sync data!');">Push Data</a>
           </li>
           @endif
