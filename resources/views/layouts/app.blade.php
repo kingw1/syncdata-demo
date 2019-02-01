@@ -15,16 +15,16 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-      <a class="navbar-brand" href="#">Blog</a>
+      <a class="navbar-brand" href="/">Blog</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav">
-          <li class="nav-item active">
+          <li class="nav-item {{ request()->segment(1) === '' || (request()->segment(1) === 'blog' && request()->segment(2) == '')  ? 'active' : '' }}">
             <a class="nav-link" href="/blog">Home <span class="sr-only">(current)</span></a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item {{ request()->segment(1) === 'blog' && request()->segment(2) === 'create' ? 'active' : '' }}">
             <a class="nav-link" href="/blog/create">Create</a>
           </li>
         </ul>
