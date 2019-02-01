@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Blog;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -50,21 +51,31 @@ class BlogController extends Controller
 
     public function pushData()
     {
-        Blog::where('is_sync', 0)->orderBy('created_at', 'ASC')->chunk(10, function ($blogs) {
-            $client = new Client();
-            $result = $client->post(config('app.url_sync_data'), ['form_params' => $blogs->toArray()]);
-            $response = json_decode($result->getBody(), true);
-            if ($response['result']) {
-                Blog::whereIn('id', $blogs->pluck('id')->toArray())->update(['is_sync' => 1]);
-            }
-        });
+        $client = new Client;
+
+        // check internet connection before push data to server
+        try {
+            $client->get('https://google.com');
+        } catch (RequestException $e) {
+            return redirect()->back()->with('message-error', 'Error, cannot connect to server.');
+        }
+
+        if (Blog::where('is_sync', 0)->count() > 0) {
+            Blog::where('is_sync', 0)->orderBy('created_at', 'ASC')->chunk(10, function ($blogs) use ($client) {
+                $result = $client->post(config('app.url_sync_data'), ['form_params' => $blogs->toArray()]);
+                $response = json_decode($result->getBody(), true);
+                if ($response['result']) {
+                    Blog::whereIn('id', $blogs->pluck('id')->toArray())->update(['is_sync' => 1]);
+                }
+            });
+        }
 
         return redirect()->back()->with('message-success', 'Sync data completed.');
     }
 
-    public function syncData(Request $request)
+    public function syncData()
     {
-        $datas = $request->all();
+        $datas = request()->all();
 
         if (count($datas) === 0) {
             return response()->json([
