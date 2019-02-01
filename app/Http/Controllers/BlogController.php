@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Blog;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -40,53 +41,47 @@ class BlogController extends Controller
     {
         $datas = $request->all();
         $datas['id'] = (string) Str::uuid();
+        $datas['created_at'] = date('Y-m-d H:i:s');
+        $datas['updated_at'] = date('Y-m-d H:i:s');
         Blog::create($datas);
 
         return redirect()->route('blog.index');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function pushData()
     {
-        //
+        Blog::where('is_sync', 0)->orderBy('created_at', 'ASC')->chunk(10, function ($blogs) {
+            $client = new Client();
+            $result = $client->post('http://db-sync.jndweb.com/data/sync', ['form_params' => $blogs->toArray()]);
+            $response = json_decode($result->getBody(), true);
+            if ($response['result']) {
+                Blog::whereIn('id', $blogs->pluck('id')->toArray())->update(['is_sync' => 1]);
+            }
+        });
+
+        return redirect()->back()->with('message-success', 'Sync data completed.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function syncData(Request $request)
     {
-        //
-    }
+        $datas = $request->all();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        if (count($datas) === 0) {
+            return response()->json([
+                'result' => false,
+                'message' => 'no data found.',
+            ], 200);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        foreach ($datas as $data) {
+            $data['is_sync'] = 1;
+            $data['sync_at'] = date('Y-m-d H:i:s');
+            Blog::create($data);
+        }
+
+        return response()->json([
+            'result' => true,
+            'message' => 'sync data completed.',
+        ], 200);
     }
 }

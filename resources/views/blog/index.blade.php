@@ -7,7 +7,14 @@
     <div class="card" style="margin-top: 20px;">
         <div class="card-header bg-primary text-light">{{ $blog->title }}</div>
         <div class="card-body">{!! $blog->content !!}</div>
-        <div class="card-footer">Created At: {{ $blog->created_at }}</div>
+        <div class="card-footer">
+            <div class="float-left">
+            Created At: {{ $blog->created_at }}
+            </div>
+            <div class="float-right">
+            Sync: {{ $blog->is_sync ? $blog->sync_at : 'false' }}
+            </div>
+        </div>
     </div>
     @endforeach
 
