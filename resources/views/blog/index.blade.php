@@ -2,6 +2,7 @@
 
 @section ('content')
 
+    @if ($blogs->count())
     @foreach ($blogs as $blog)
     <div class="card" style="margin-top: 20px;">
         <div class="card-header bg-primary text-light">{{ $blog->title }}</div>
@@ -13,5 +14,11 @@
     <p>
         {!! $blogs->links() !!}
     </p>
+
+    @else
+    <div class="alert alert-danger">
+        No Data.
+    </div>
+    @endif
 
 @endsection
