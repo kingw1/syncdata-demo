@@ -52,7 +52,7 @@ class BlogController extends Controller
     {
         Blog::where('is_sync', 0)->orderBy('created_at', 'ASC')->chunk(10, function ($blogs) {
             $client = new Client();
-            $result = $client->post('http://db-sync.jndweb.com/data/sync', ['form_params' => $blogs->toArray()]);
+            $result = $client->post(config('app.url_sync_data'), ['form_params' => $blogs->toArray()]);
             $response = json_decode($result->getBody(), true);
             if ($response['result']) {
                 Blog::whereIn('id', $blogs->pluck('id')->toArray())->update(['is_sync' => 1]);

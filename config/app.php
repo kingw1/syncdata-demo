@@ -53,6 +53,7 @@ return [
      */
 
     'url' => env('APP_URL', 'http://localhost'),
+    'url_sync_data' => env('APP_URL_SYNC', 'http://localhost'),
 
     'asset_url' => env('ASSET_URL', null),
 
